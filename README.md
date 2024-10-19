@@ -7,9 +7,12 @@ After running out of daily allowance on both Anthropic and OpenAI I got what's i
 - Dark/Light theme
 - Number of Exchanges between 3 and 30
 - Supports streaming/interrupting of responses
-- Supports different system prompt for each endpoint
 - The endpoint addresses and system prompts are stored in browser Local Storage
-
+- Supports different system prompt for each endpoint
+- I used the following system prompt for both while testing:
+```
+You are an AI with a distinct personality. Respond naturally to the given prompt, as if in a real conversation. Keep your reply focused and concise, ideally around 50-75 words. Don't continue the conversation beyond your response or roleplay as anyone else. Engage with the topic, add your perspective, or ask a relevant question, but always conclude your response naturally. Avoid overly formal or flowery language - aim for a casual, friendly tone.
+```
 
 
 ![image_2024-10-19_21-06-29](https://github.com/user-attachments/assets/8e04143e-9908-4d7c-80ff-8d8a5bf07c80)
