@@ -1,6 +1,6 @@
 # llm-convo
-I used 2 LLM's (Claude Sonnet 3.5 and gpt-4o) to write an app that would let 2 openai compatible endpoints talk to each other. 
-After running out of daily allowance on both Anthropic and OpenAI I got what's in this repo. I have zero experience with python. Was more of an experiment if I can make an app without any experience more than anything else.
+I used 2 LLMs (Claude Sonnet 3.5 and chatgpt-4o-latest) to write an app that would let 2 LLMs with openai compatible api endpoints talk to each other. I have zero experience with python.
+After running out of daily allowance on both Anthropic and OpenAI I got what's in this repo. Was more of an experiment if I can make an app without any experience more than anything else.
 
 ONLY TESTED with koboldcpp openai compatible endpoints
 
@@ -15,6 +15,7 @@ ONLY TESTED with koboldcpp openai compatible endpoints
 ![image_2024-10-19_21-06-29](https://github.com/user-attachments/assets/8e04143e-9908-4d7c-80ff-8d8a5bf07c80)
 
 
+
 To try it out in docker:
 ```
 git clone https://github.com/hugalafutro/llm-convo.git
@@ -22,6 +23,7 @@ cd llm-convo
 docker compose build
 docker compose up -d
 ```
+
 
 Check docker logs `docker compose logs -f`:
 ```
@@ -33,6 +35,7 @@ llm-convo  |  * Running on http://127.0.0.1:5000
 llm-convo  |  * Running on http://172.26.0.2:5000
 llm-convo  | Press CTRL+C to quit
 ```
+
 
 - Visit `http://0.0.0.0:5234` 
 - Write the Intial Prompt in the bottom text input area and click the Send button
