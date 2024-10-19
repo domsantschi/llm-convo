@@ -2,7 +2,7 @@
 I used 2 LLMs (Claude Sonnet 3.5 and chatgpt-4o-latest) to write an app that would let 2 LLMs with openai compatible api endpoints talk to each other. I have zero experience with python.
 After running out of daily allowance on both Anthropic and OpenAI I got what's in this repo. Was more of an experiment if I can make an app without any experience more than anything else.
 
-ONLY TESTED with koboldcpp openai compatible endpoints
+# ONLY TESTED with koboldcpp openai compatible endpoints
 
 - Dark/Light theme
 - Number of Exchanges between 3 and 30
