@@ -4,6 +4,7 @@ After running out of daily allowance on both Anthropic and OpenAI I got what's i
 I used open-webui as frontend to "develop" this.
 
 # ONLY TESTED with koboldcpp openai compatible endpoints
+*I have no idea what I'm doing it was the LLMs I swear*
 
 - Dark/Light theme
 - Number of Exchanges between 3 and 30
