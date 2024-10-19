@@ -23,7 +23,7 @@ docker compose build
 docker compose up -d
 ```
 
-Check docker logs all is fine:
+Check docker logs `docker compose logs -f`:
 ```
 llm-convo  |  * Serving Flask app 'app.py'
 llm-convo  |  * Debug mode: off
