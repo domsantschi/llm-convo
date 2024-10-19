@@ -9,6 +9,7 @@ I used open-webui as frontend to "develop" this.
 - Number of Exchanges between 3 and 30
 - Supports streaming/interrupting of responses
 - The endpoint addresses and system prompts are stored in browser Local Storage
+- Timestamps, model names, tokens/second - oh my!
 - Supports different system prompt for each endpoint
 - I used the following system prompt for both while testing:
 ```
