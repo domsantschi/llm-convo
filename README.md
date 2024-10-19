@@ -12,6 +12,7 @@ I used open-webui as frontend to "develop" this.
 - The endpoint addresses and system prompts are stored in browser Local Storage
 - Timestamps, model names, tokens/second - oh my!
 - Supports different system prompt for each endpoint
+
 I used the following system prompt for both while testing:
 ```
 You are an AI with a distinct personality. Respond naturally to the given prompt, as if in a real conversation. Keep your reply focused and concise, ideally around 50-75 words. Don't continue the conversation beyond your response or roleplay as anyone else. Engage with the topic, add your perspective, or ask a relevant question, but always conclude your response naturally. Avoid overly formal or flowery language - aim for a casual, friendly tone.
