@@ -12,10 +12,10 @@ The *almost* whole conversation exported to pdf: [chat-LLM Convo development.pdf
 
 - Dark/Light theme
 - Number of Exchanges between 3 and 30
-- Supports streaming/interrupting of responses
-- The endpoint addresses and system prompts are stored in browser Local Storage
+- Streaming/interrupting of responses
+- Endpoint addresses and System prompts are stored in browser Local Storage
 - Timestamps, model names, tokens/second - oh my!
-- Supports different system prompt for each endpoint
+- (Optional) different system prompt for each endpoint
 - Buttons change colors with state
 
 Involving in third LLM (locally running Qwen2.5-Coder-7B-Instruct-Q6_K_L.gguf) I was able to bribe it with enough *virtual head pats* to implement sending of the whole conversation with the prompt. Previously the models would only directly respond to the other models last output. Now they "remember".
