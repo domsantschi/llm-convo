@@ -15,13 +15,16 @@ _edit: I successfully managed to implement some stuff while continuing the conve
 - Timestamps, model names, tokens/second - oh my!
 - Supports different system prompt for each endpoint
 
+Involving in third LLM (locally running Qwen2.5-Coder-7B-Instruct-Q6_K_L.gguf) I was able to bribe it with enough *virtual head pats* to implement sending of the whole conversation with the prompt. Previously the models would only directly respond to the other model's last output. Now they "remember".
+
 I used the following system prompt for both while testing:
 ```
 You are an AI with a distinct personality. Respond naturally to the given prompt, as if in a real conversation. Keep your reply focused and concise, ideally around 50-75 words. Don't continue the conversation beyond your response or roleplay as anyone else. Engage with the topic, add your perspective, or ask a relevant question, but always conclude your response naturally. Avoid overly formal or flowery language - aim for a casual, friendly tone.
 ```
 
 
-![image_2024-10-19_21-06-29](https://github.com/user-attachments/assets/8e04143e-9908-4d7c-80ff-8d8a5bf07c80)
+![image_2024-10-20_12-35-59](https://github.com/user-attachments/assets/74b355ea-6613-4865-aebc-df419f36e5c2)
+
 
 
 
