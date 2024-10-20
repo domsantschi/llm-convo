@@ -16,6 +16,7 @@ _(I had to remove posts with pictures as I was running out of quota and later us
 - The endpoint addresses and system prompts are stored in browser Local Storage
 - Timestamps, model names, tokens/second - oh my!
 - Supports different system prompt for each endpoint
+- Buttons change colors with state
 
 Involving in third LLM (locally running Qwen2.5-Coder-7B-Instruct-Q6_K_L.gguf) I was able to bribe it with enough *virtual head pats* to implement sending of the whole conversation with the prompt. Previously the models would only directly respond to the other model's last output. Now they "remember".
 
