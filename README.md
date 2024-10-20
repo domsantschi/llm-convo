@@ -6,7 +6,7 @@ I used 2 LLMs (Claude Sonnet 3.5 and chatgpt-4o-latest) to write an app that wou
 _edit: I successfully managed to implement some stuff while continuing the conversation in [open-webui](https://github.com/open-webui/open-webui) with locally running [Qwen2.5-Coder-7B-Instruct-Q6_K_L.gguf](https://huggingface.co/bartowski/Qwen2.5-Coder-7B-Instruct-GGUF) in [koboldcpp](https://github.com/LostRuins/koboldcpp)_
 
 The *almost* whole conversation exported to pdf: [chat-LLM Convo development.pdf](https://github.com/user-attachments/files/17450061/chat-LLM.Convo.development.pdf)
-_(I had to remove posts with pictures as I was running out of quota and later using model which could not ingest images. So if there is a jarring disconnect or a missing reply it was a reply with picture.)_
+*(I had to remove posts with pictures as I was running out of quota and later using model which could not ingest images. So if there is a jarring disconnect or a missing reply it was a reply with picture.)*
 
 # ONLY TESTED with [koboldcpp](https://github.com/LostRuins/koboldcpp) openai compatible endpoints
 
