@@ -321,7 +321,6 @@
                     // Enable Stop button and change its color to red
                     $('#stop').prop('disabled', false).css('background-color', 'var(--button-pending-bg-color)');
     
-                    var currentMessage = null;
                     var currentContent = '';
     
                     currentXHR.onprogress = function() {
@@ -338,10 +337,7 @@
                                         return;
                                     }
                                     if (data.sender) {
-                                        if (currentMessage) {
-                                            currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
-                                        }
-                                        currentMessage = $('<div class="message">');
+                                        var currentMessage = $('<div class="message">');
                                         currentMessage.data('sender', data.sender);
                                         currentContent = '';
                                         var messageHtml = '<p><strong>' + data.sender + ':</strong> ';
@@ -350,19 +346,22 @@
                                         }
                                         messageHtml += '</p>';
                                         currentMessage.html(messageHtml);
-                                        conversation.append(currentMessage);
+                                        $('#conversation').append(currentMessage);
                                     } else if (data.content) {
                                         currentContent += data.content;
-                                        if (currentMessage) {
+                                        var currentMessage = $('#conversation').find('.message:last');
+                                        if (currentMessage.length > 0) {
                                             currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
                                         }
                                     } else if (data.end) {
-                                        currentMessage.find('.message-info').append('<br>'
-                                            + data.timestamp + ' - '
-                                            + data.model + ' - '
-                                            + data.total_tokens + ' tokens - '
-                                            + data.tps.toFixed(2) + ' tokens/sec');
-                                        currentMessage = null;
+                                        var currentMessage = $('#conversation').find('.message:last');
+                                        if (currentMessage.length > 0) {
+                                            currentMessage.find('.message-info').append('<br>'
+                                                + data.timestamp + ' - '
+                                                + data.model + ' - '
+                                                + data.total_tokens + ' tokens - '
+                                                + data.tps.toFixed(2) + ' tokens/sec');
+                                        }
                                         currentContent = '';
                                         conversationHistory.push({sender: data.sender, message: currentContent});
                                     }
@@ -378,7 +377,8 @@
                     };
     
                     currentXHR.onload = function() {
-                        if (currentMessage) {
+                        var currentMessage = $('#conversation').find('.message:last');
+                        if (currentMessage.length > 0) {
                             currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
                         }
                         // Disable Stop button and change its color back to grey
