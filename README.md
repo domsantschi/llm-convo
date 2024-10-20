@@ -18,7 +18,7 @@ The *almost* whole conversation exported to pdf: [chat-LLM Convo development.pdf
 - (Optional) different system prompt for each endpoint
 - Buttons change colors with state
 
-Involving in third LLM (locally running Qwen2.5-Coder-7B-Instruct-Q6_K_L.gguf) I was able to bribe it with enough *virtual head pats* to implement sending of the whole conversation with the prompt. Previously the models would only directly respond to the other models last output. Now they "remember".
+Involving in third LLM (locally running Qwen2.5-Coder-7B-Instruct) I was able to bribe it with enough *virtual head pats* to implement sending of the whole conversation with the prompt. Previously the models would only directly respond to the other models last output. Now they "remember".
 
 I used the following system prompt for both while testing:
 ```
