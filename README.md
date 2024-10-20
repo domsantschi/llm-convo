@@ -3,8 +3,10 @@ I used 2 LLMs (Claude Sonnet 3.5 and chatgpt-4o-latest) to write an app that wou
 After running out of daily allowance on both Anthropic and OpenAI I got what's in this repo. Was more of an experiment if I can make an app without any experience more than anything else.
 I used open-webui as frontend to "develop" this.
 
+_edit: I successfully managed to implement some stuff while continuing the conversation in open-webui with locally running Qwen2.5-Coder-7B-Instruct-Q6_K_L.gguf_
+
 # ONLY TESTED with koboldcpp openai compatible endpoints
-*I have no idea what I'm doing it was the LLMs I swear*
+***`I have no idea what I'm doing it was the LLMs I swear`***
 
 - Dark/Light theme
 - Number of Exchanges between 3 and 30
