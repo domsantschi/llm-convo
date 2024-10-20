@@ -8,7 +8,7 @@ _edit: I successfully managed to implement some stuff while continuing the conve
 The *almost* whole conversation exported to pdf: [chat-LLM Convo development.pdf](https://github.com/user-attachments/files/17450061/chat-LLM.Convo.development.pdf)
 *(I had to remove posts with pictures as I was running out of quota and later using model which could not ingest images. So if there is a jarring disconnect or a missing reply it was a reply with picture.)*
 
-# ONLY TESTED with [koboldcpp](https://github.com/LostRuins/koboldcpp) openai compatible endpoints
+# TESTED with [koboldcpp](https://github.com/LostRuins/koboldcpp), [LM Studio](https://github.com/lmstudio-ai) openai compatible endpoints
 
 - Dark/Light theme
 - Number of Exchanges between 3 and 30
@@ -53,10 +53,14 @@ llm-convo  | Press CTRL+C to quit
 
 
 - Visit `http://0.0.0.0:5234`
-- Enter the openai compatible api checkpoint address in format `http://address:port/v1` i.e. `http://192.168.1.163:5001/v1` and press Connect Endpoint button for both Endpoints.
+- If using [koboldcpp](https://github.com/LostRuins/koboldcpp) enter the Endpoint address in format `http://address:port/v1` i.e. `http://192.168.1.163:5001/v1`
+- If using [LM Studio](https://github.com/lmstudio-ai) enter the Endpoint address in format `http://address:port` i.e. `http://192.168.1.163:5001`
+- press Connect Endpoint button.
 - You should get an popup connection succesful and the Endpoint button will turn green.
 - Once both Endpoint buttons are green it's go time.
 - Write the Intial Prompt in the bottom text input area and click the Send button.
+- ???
+- Profit.
 
 ---
 
