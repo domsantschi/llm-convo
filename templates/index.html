@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LLM Convo</title>
+    <title>LLM Conversation</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         :root {
@@ -13,8 +13,7 @@
             --input-border-color: #444;
             --conversation-bg-color: #2a2a2a;
             --message-bg-color: #3a3a3a;
-            --button-ready-bg-color: #4CAF50;
-            --button-pending-bg-color: #ff4a4a;
+            --button-bg-color: #4CAF50;
             --button-text-color: white;
         }
 
@@ -25,8 +24,7 @@
             --input-border-color: #ccc;
             --conversation-bg-color: #fff;
             --message-bg-color: #e9e9e9;
-            --button-ready-bg-color: #4CAF50;
-            --button-pending-bg-color: #ff4a4a;
+            --button-bg-color: #4CAF50;
             --button-text-color: white;
         }
 
@@ -70,6 +68,8 @@
             margin-bottom: 10px;
             background-color: var(--conversation-bg-color);
         }
+        
+        /* Bubble under Initial Prompt for inserting user's input */
         #initial-prompt-text {
             margin: 10px;
             padding: 10px;
@@ -80,9 +80,7 @@
 
         #prompt-container {
             display: flex;
-            align-items: center;
             margin-top: 10px;
-            gap: 10px;
         }
         #prompt {
             flex-grow: 1;
@@ -92,20 +90,9 @@
             border: 1px solid var(--input-border-color);
             padding: 5px;
         }
-        /* Send and Stop buttons */
         button {
-            background-color: var(--button-ready-bg-color);
+            background-color: var(--button-bg-color);
             border: none;
-            color: var(--button-text-color);
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .stop-btn {
-            background-color: var(--button-pending-bg-color);
             color: var(--button-text-color);
             padding: 10px 20px;
             text-align: center;
@@ -125,13 +112,6 @@
             color: #888;
             text-align: right;
             margin-top: 5px;
-        }
-        .connect-btn {
-            padding: 10px 20px;
-            color: var(--button-text-color);
-            cursor: pointer;
-            background-color: var(--button-pending-bg-color);
-            border: none;
         }
         #num-exchanges-container {
             margin-bottom: 10px;
@@ -166,14 +146,14 @@
             content: '☀️';
         }
         .theme-toggle input:checked + label {
-            background-color: var(--button-ready-bg-color);
+            background-color: var(--button-bg-color);
             color: var(--button-text-color);
         }
     </style>
 </head>
 <body>
     <div id="chat-container">
-        <h1>LLM Convo</h1>
+        <h1>LLM Conversation</h1>
         <div class="theme-toggle">
             <input type="checkbox" id="theme-switch">
             <label for="theme-switch"></label>
@@ -182,12 +162,12 @@
             <div class="endpoint">
                 <input type="text" id="endpoint1" placeholder="Enter Endpoint 1 URL">
                 <textarea id="system-prompt1" placeholder="Enter System Prompt for Endpoint 1 (optional)"></textarea>
-                <button id="connect-endpoint1" class="connect-btn" onclick="connectEndpoint(1)">Connect Endpoint 1</button>
+                <button onclick="connectEndpoint(1)">Connect Endpoint 1</button>
             </div>
             <div class="endpoint">
                 <input type="text" id="endpoint2" placeholder="Enter Endpoint 2 URL">
                 <textarea id="system-prompt2" placeholder="Enter System Prompt for Endpoint 2 (optional)"></textarea>
-                <button id="connect-endpoint2" class="connect-btn" onclick="connectEndpoint(2)">Connect Endpoint 2</button>
+                <button onclick="connectEndpoint(2)">Connect Endpoint 2</button>
             </div>
         </div>
         <div id="num-exchanges-container">
@@ -196,20 +176,17 @@
         </div>
 
         <div id="conversation">
+            <!-- Pre-defined bubble for Initial Prompt -->
             <div id="initial-prompt-text"><strong>Initial Prompt:</strong> <span id="initial-prompt-content"></span></div>
         </div>
 
         <div id="prompt-container">
             <input type="text" id="prompt" placeholder="Enter your initial prompt here">
             <button id="send">Send</button>
-            <!-- Square Stop Button now with UTF-8 Square symbol -->
-            <button class="stop-btn" id="stop" title="Stop Streaming">■</button>
         </div>
     </div>
 
     <script>
-        var currentXHR = null;  // Track the active request for stopping
-
         function connectEndpoint(endpointNum) {
             var endpointUrl = $('#endpoint' + endpointNum).val();
             var systemPrompt = $('#system-prompt' + endpointNum).val();
@@ -225,7 +202,7 @@
                     }),
                     success: function(response) {
                         alert(response.message);
-                        $('#connect-endpoint' + endpointNum).css('background-color', 'var(--button-ready-bg-color)');
+                        // Save to localStorage
                         localStorage.setItem('endpoint' + endpointNum, endpointUrl);
                         localStorage.setItem('systemPrompt' + endpointNum, systemPrompt);
                     }
@@ -234,41 +211,40 @@
         }
 
         $(document).ready(function() {
-            // Load saved endpoint and system prompts
+            // Load saved values
             $('#endpoint1').val(localStorage.getItem('endpoint1') || '');
             $('#endpoint2').val(localStorage.getItem('endpoint2') || '');
             $('#system-prompt1').val(localStorage.getItem('systemPrompt1') || '');
             $('#system-prompt2').val(localStorage.getItem('systemPrompt2') || '');
 
-            // Set number range slider
             $('#num-exchanges').on('input', function() {
                 $('#num-exchanges-value').text($(this).val());
             });
 
-            // Send the prompt and start the streaming
 		$('#send').click(function() {
 			var prompt = $('#prompt').val();
 			var numExchanges = $('#num-exchanges').val();
 			
 			if (prompt) {
-				// Insert user prompt into the Initial Prompt container
+				
+				// Inject user's prompt directly into the pre-defined Initial Prompt placeholder
 				$('#initial-prompt-content').text(prompt);
-
-				// Cleanup conversation and input field
+				
+				// Clear the input field after submission
 				$('#prompt').val('');
 
-				// Track the ongoing XMLHttpRequest to allow abortion
-				currentXHR = new XMLHttpRequest();
-				currentXHR.open('POST', '/chat', true);
-				currentXHR.setRequestHeader('Content-Type', 'application/json');
-				currentXHR.send(JSON.stringify({ prompt: prompt, num_exchanges: numExchanges }));
+				// Continue with the streaming response for Models
+				var xhr = new XMLHttpRequest();
+				xhr.open('POST', '/chat', true);
+				xhr.setRequestHeader('Content-Type', 'application/json');
+				xhr.send(JSON.stringify({prompt: prompt, num_exchanges: numExchanges}));
 
 				var currentMessage = null;
 				var currentContent = '';
 
-				currentXHR.onprogress = function() {
-					var newData = currentXHR.response.substr(currentXHR.seenBytes || 0);
-					currentXHR.seenBytes = currentXHR.response.length;
+				xhr.onprogress = function() {
+					var newData = xhr.response.substr(xhr.seenBytes || 0);
+					xhr.seenBytes = xhr.response.length;
 
 					var messages = newData.split('\n');
 					messages.forEach(function(message) {
@@ -276,49 +252,52 @@
 							try {
 								var data = JSON.parse(message);
 
+								if (data.error) {
+									alert('Error: ' + data.error);
+									return;
+								}
+
 								if (data.sender) {
 									if (currentMessage) {
 										currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
 									}
 									currentMessage = $('<div class="message">');
 									currentMessage.data('sender', data.sender);
-									currentContent = ''; // Clear content for new message
+									currentContent = ''; // Reset content for new message
 
-									// Bubble creation for Models
+									// Message bubble creation
 									var messageHtml = '<p><strong>' + data.sender + ':</strong> ';
 									if (data.message) {
-										messageHtml += data.message;
+										messageHtml += data.message; // Handle normal message (Model 1/2)
 									}
 									messageHtml += '</p>';
 									currentMessage.html(messageHtml);
 									$('#conversation').append(currentMessage);
 
+								// Handle content streams (Model dialogue)
 								} else if (data.content) {
-									// Append content from the models
 									currentContent += data.content;
 									if (currentMessage) {
 										currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
 									}
 								} else if (data.end) {
-									// Append timestamp, model name, tokens per second (tps)
-									console.log(`[DEBUG] Model: ${data.model}, Timestamp: ${data.timestamp}, T/S: ${data.tps}`);
-									var modelStats = '<div class="message-info">' 
-											+ '<br>' + data.timestamp 
-											+ ' - ' + data.model 
-											+ ' - ' + data.tps.toFixed(2) + ' tokens/sec' 
-											+ '</div>';
-									currentMessage.append(modelStats);  // Append stats below message
-									currentMessage = null; // Clear message tracking
+									// Once conversation part ends, append token stats
+									currentMessage.find('.message-info').append('<br>'
+										+ data.total_tokens + ' tokens - '
+										+ data.tps.toFixed(2) + ' tokens/sec');
+									currentMessage = null; // Reset for next exchange
 								}
 							} catch (e) {
-								console.error('Error parsing message: ', e);
+								console.error('Error parsing message:', e);
 							}
 						}
 					});
-					$('#conversation').scrollTop($('#conversation')[0].scrollHeight);  // Auto-scroll conversation
+
+					// Autoscroll to bottom of the conversation as new messages arrive
+					$('#conversation').scrollTop($('#conversation')[0].scrollHeight);
 				};
 
-				currentXHR.onload = function() {
+				xhr.onload = function() {
 					if (currentMessage) {
 						currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
 					}
@@ -326,14 +305,6 @@
 			}
 		});
 
-            // Stop button to abort streaming
-            $('#stop').click(function() {
-                if (currentXHR) {
-                    currentXHR.abort();  // Abort the ongoing request
-                    alert('Streaming stopped.');
-                }
-            });
-			
             // Theme toggle functionality
             $('#theme-switch').change(function () {
                 if (this.checked) {
@@ -349,8 +320,7 @@
             var savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'light') {
                 $('#theme-switch').prop('checked', true).trigger('change');
-            }			
-			
+            }
         });
     </script>
 </body>
