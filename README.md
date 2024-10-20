@@ -53,8 +53,8 @@ llm-convo  | Press CTRL+C to quit
 
 
 - Visit `http://0.0.0.0:5234`
-- If using [koboldcpp](https://github.com/LostRuins/koboldcpp) enter the Endpoint address in format `http://address:port/v1` i.e. `http://192.168.1.163:5001/v1`
-- If using [LM Studio](https://github.com/lmstudio-ai) enter the Endpoint address in format `http://address:port` i.e. `http://192.168.1.163:5001`
+- For [koboldcpp](https://github.com/LostRuins/koboldcpp) enter the Endpoint address in format `http://address:port/v1` i.e. `http://192.168.1.163:5001/v1`
+- For [LM Studio](https://github.com/lmstudio-ai) enter the Endpoint address in format `http://address:port` i.e. `http://192.168.1.163:5001`
 - press Connect Endpoint button.
 - You should get an popup connection succesful and the Endpoint button will turn green.
 - Once both Endpoint buttons are green it's go time.
