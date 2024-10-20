@@ -197,7 +197,7 @@
         </div>
 
         <div id="prompt-container">
-            <input type="text" id="prompt" placeholder="Enter your initial prompt here">
+            <input type="text" id="prompt" placeholder="Enter your initial prompt here" onkeydown="if (event.key === 'Enter') { $('#send').click(); }">
             <button id="send">Send</button>
             <button class="stop-btn" id="stop" title="Stop Streaming">■</button>
         </div>
@@ -277,81 +277,88 @@
             $('#send').prop('disabled', true).css('background-color', 'var(--button-inactive-bg-color)');
             $('#stop').prop('disabled', true).css('background-color', 'var(--button-inactive-bg-color)');
 
-            $('#send').click(function() {
-                var prompt = $('#prompt').val();
-                var numExchanges = $('#num-exchanges').val();
-                if (prompt) {
-                    $('#initial-prompt-content').text(prompt);
-                    $('#prompt').val('');
+         $('#send').click(function() {
+            var prompt = $('#prompt').val();
+            var numExchanges = $('#num-exchanges').val();
+            if (prompt) {
+                // Update the initial prompt content without clearing the conversation
+                $('#initial-prompt-content').text(prompt);
+                $('#prompt').val('');
 
-                    var conversation = $('#conversation');
-                    conversation.empty();
-                    
-                    currentXHR = new XMLHttpRequest();
-                    currentXHR.open('POST', '/chat', true);
-                    currentXHR.setRequestHeader('Content-Type', 'application/json');
-                    currentXHR.send(JSON.stringify({prompt: prompt, num_exchanges: numExchanges}));
+                var conversation = $('#conversation');
+                
+                currentXHR = new XMLHttpRequest();
+                currentXHR.open('POST', '/chat', true);
+                currentXHR.setRequestHeader('Content-Type', 'application/json');
+                currentXHR.send(JSON.stringify({prompt: prompt, num_exchanges: numExchanges}));
 
-                    // Enable Stop button and change its color to red
-                    $('#stop').prop('disabled', false).css('background-color', 'var(--button-pending-bg-color)');
+                // Enable Stop button and change its color to red
+                $('#stop').prop('disabled', false).css('background-color', 'var(--button-pending-bg-color)');
 
-                    var currentMessage = null;
-                    var currentContent = '';
+                var currentMessage = null;
+                var currentContent = '';
 
-                    currentXHR.onprogress = function() {
-                        var newData = currentXHR.response.substr(currentXHR.seenBytes || 0);
-                        currentXHR.seenBytes = currentXHR.response.length;
+                currentXHR.onprogress = function() {
+                    var newData = currentXHR.response.substr(currentXHR.seenBytes || 0);
+                    currentXHR.seenBytes = currentXHR.response.length;
 
-                        var messages = newData.split('\n');
-                        messages.forEach(function(message) {
-                            if (message.trim() !== '') {
-                                try {
-                                    var data = JSON.parse(message);
-                                    if (data.error) {
-                                        alert('Error: ' + data.error);
-                                        return;
-                                    }
-                                    if (data.sender) {
-                                        if (currentMessage) {
-                                            currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
-                                        }
-                                        currentMessage = $('<div class="message">');
-                                        currentMessage.data('sender', data.sender);
-                                        currentContent = '';
-                                        var messageHtml = '<p><strong>' + data.sender + ':</strong> ';
-                                        if (data.message) {
-                                            messageHtml += data.message;
-                                        }
-                                        messageHtml += '</p>';
-                                        currentMessage.html(messageHtml);
-                                        conversation.append(currentMessage);
-                                    } else if (data.content) {
-                                        currentContent += data.content;
-                                        if (currentMessage) {
-                                            currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
-                                        }
-                                    } else if (data.end) {
-                                        currentMessage.find('.message-info').append('<br>'
-                                            + data.total_tokens + ' tokens - '
-                                            + data.tps.toFixed(2) + ' tokens/sec');
-                                    }
-                                } catch (e) {
-                                    console.error('Error parsing message:', e);
+                    var messages = newData.split('\n');
+                    messages.forEach(function(message) {
+                        if (message.trim() !== '') {
+                            try {
+                                var data = JSON.parse(message);
+                                if (data.error) {
+                                    alert('Error: ' + data.error);
+                                    return;
                                 }
+                                if (data.sender) {
+                                    if (currentMessage) {
+                                        currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
+                                    }
+                                    currentMessage = $('<div class="message">');
+                                    currentMessage.data('sender', data.sender);
+                                    currentContent = '';
+                                    var messageHtml = '<p><strong>' + data.sender + ':</strong> ';
+                                    if (data.message) {
+                                        messageHtml += data.message;
+                                    }
+                                    messageHtml += '</p>';
+                                    currentMessage.html(messageHtml);
+                                    conversation.append(currentMessage);
+                                } else if (data.content) {
+                                    currentContent += data.content;
+                                    if (currentMessage) {
+                                        currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
+                                    }
+                                } else if (data.end) {
+                                    if (currentMessage) {
+                                        var statsHtml = '<div class="message-info">'
+                                            + data.timestamp + ' - '
+                                            + data.model + ' - '
+                                            + data.total_tokens + ' tokens - '
+                                            + data.tps.toFixed(2) + ' tokens/sec</div>';
+                                        currentMessage.append(statsHtml);
+                                    }
+                                    currentMessage = null;
+                                    currentContent = '';
+                                }
+                            } catch (e) {
+                                console.error('Error parsing message:', e);
                             }
-                        });
-                        conversation.scrollTop(conversation[0].scrollHeight);
-                    };
-
-                    currentXHR.onload = function() {
-                        if (currentMessage) {
-                            currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
                         }
-                        // Disable Stop button and change its color back to grey
-                        $('#stop').prop('disabled', true).css('background-color', 'var(--button-inactive-bg-color)');
-                    };
-                }
-            });
+                    });
+                    conversation.scrollTop(conversation[0].scrollHeight);
+                };
+
+                currentXHR.onload = function() {
+                    if (currentMessage) {
+                        currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
+                    }
+                    // Disable Stop button and change its color back to grey
+                    $('#stop').prop('disabled', true).css('background-color', 'var(--button-inactive-bg-color)');
+                };
+            }
+        });
 
             $('#stop').click(function() {
                 if (currentXHR) {
