@@ -207,8 +207,7 @@
         var currentXHR = null;  // Track the active request for stopping
         var endpoint1Connected = false;
         var endpoint2Connected = false;
-        var conversationHistory = [];
-    
+
         function connectEndpoint(endpointNum) {
             var endpointUrl = $('#endpoint' + endpointNum).val();
             var systemPrompt = $('#system-prompt' + endpointNum).val();
@@ -258,7 +257,7 @@
                 });
             }
         }
-    
+
         function updateSendButtonState() {
             if (endpoint1Connected && endpoint2Connected) {
                 $('#send').prop('disabled', false).css('background-color', 'var(--button-ready-bg-color)');
@@ -266,67 +265,46 @@
                 $('#send').prop('disabled', true).css('background-color', 'var(--button-inactive-bg-color)');
             }
         }
-    
-        function addMessage(sender, message) {
-            var conversation = $('#conversation');
-            if (conversation.length === 0) {
-                console.error('Conversation element not found!');
-                return;
-            }
-            var messageHtml = '<div class="message"><p><strong>' + sender + ':</strong> ' + message + '</p></div>';
-            conversation.append(messageHtml);
-            conversation.scrollTop(conversation[0].scrollHeight);
-        }
-    
+
         $(document).ready(function() {
             // Load saved values
             $('#endpoint1').val(localStorage.getItem('endpoint1') || '');
             $('#endpoint2').val(localStorage.getItem('endpoint2') || '');
             $('#system-prompt1').val(localStorage.getItem('systemPrompt1') || '');
             $('#system-prompt2').val(localStorage.getItem('systemPrompt2') || '');
-    
+
             $('#num-exchanges').on('input', function() {
                 $('#num-exchanges-value').text($(this).val());
             });
-    
+
             // Initially disable Send and Stop buttons
             $('#send').prop('disabled', true).css('background-color', 'var(--button-inactive-bg-color)');
             $('#stop').prop('disabled', true).css('background-color', 'var(--button-inactive-bg-color)');
-    
+
             $('#send').click(function() {
                 var prompt = $('#prompt').val();
                 var numExchanges = $('#num-exchanges').val();
                 if (prompt) {
-                    // Add current prompt to conversation history
-                    conversationHistory.push({sender: 'You', message: prompt});
-    
-                    // Update initial prompt text
                     $('#initial-prompt-content').text(prompt);
                     $('#prompt').val('');
-    
-                    // Send conversation history to backend
-                    var conversationData = {
-                        prompt: prompt,
-                        num_exchanges: numExchanges,
-                        conversation_history: conversationHistory,
-                        system_prompt1: localStorage.getItem('systemPrompt1') || '',
-                        system_prompt2: localStorage.getItem('systemPrompt2') || ''
-                    };
-    
+
+                    var conversation = $('#conversation');
+                    
                     currentXHR = new XMLHttpRequest();
                     currentXHR.open('POST', '/chat', true);
                     currentXHR.setRequestHeader('Content-Type', 'application/json');
-                    currentXHR.send(JSON.stringify(conversationData));
-    
+                    currentXHR.send(JSON.stringify({prompt: prompt, num_exchanges: numExchanges}));
+
                     // Enable Stop button and change its color to red
                     $('#stop').prop('disabled', false).css('background-color', 'var(--button-pending-bg-color)');
-    
+
+                    var currentMessage = null;
                     var currentContent = '';
-    
+
                     currentXHR.onprogress = function() {
                         var newData = currentXHR.response.substr(currentXHR.seenBytes || 0);
                         currentXHR.seenBytes = currentXHR.response.length;
-    
+
                         var messages = newData.split('\n');
                         messages.forEach(function(message) {
                             if (message.trim() !== '') {
@@ -337,7 +315,10 @@
                                         return;
                                     }
                                     if (data.sender) {
-                                        var currentMessage = $('<div class="message">');
+                                        if (currentMessage) {
+                                            currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
+                                        }
+                                        currentMessage = $('<div class="message">');
                                         currentMessage.data('sender', data.sender);
                                         currentContent = '';
                                         var messageHtml = '<p><strong>' + data.sender + ':</strong> ';
@@ -346,39 +327,34 @@
                                         }
                                         messageHtml += '</p>';
                                         currentMessage.html(messageHtml);
-                                        $('#conversation').append(currentMessage);
+                                        conversation.append(currentMessage);
                                     } else if (data.content) {
                                         currentContent += data.content;
-                                        var currentMessage = $('#conversation').find('.message:last');
-                                        if (currentMessage.length > 0) {
+                                        if (currentMessage) {
                                             currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
                                         }
                                     } else if (data.end) {
-                                        var currentMessage = $('#conversation').find('.message:last');
-                                        if (currentMessage.length > 0) {
-                                            currentMessage.find('.message-info').append('<br>'
+                                        if (currentMessage) {
+                                            var statsHtml = '<div class="message-info">'
                                                 + data.timestamp + ' - '
                                                 + data.model + ' - '
                                                 + data.total_tokens + ' tokens - '
-                                                + data.tps.toFixed(2) + ' tokens/sec');
+                                                + data.tps.toFixed(2) + ' tokens/sec</div>';
+                                            currentMessage.append(statsHtml);
                                         }
+                                        currentMessage = null;
                                         currentContent = '';
-                                        conversationHistory.push({sender: data.sender, message: currentContent});
                                     }
                                 } catch (e) {
                                     console.error('Error parsing message:', e);
                                 }
                             }
                         });
-                        var conversation = $('#conversation');
-                        if (conversation.length > 0) {
-                            conversation.scrollTop(conversation[0].scrollHeight);
-                        }
+                        conversation.scrollTop(conversation[0].scrollHeight);
                     };
-    
+
                     currentXHR.onload = function() {
-                        var currentMessage = $('#conversation').find('.message:last');
-                        if (currentMessage.length > 0) {
+                        if (currentMessage) {
                             currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
                         }
                         // Disable Stop button and change its color back to grey
@@ -386,7 +362,7 @@
                     };
                 }
             });
-    
+
             $('#stop').click(function() {
                 if (currentXHR) {
                     currentXHR.abort();
@@ -395,7 +371,7 @@
                     alert('Streaming stopped.');
                 }
             });
-    
+
             // Theme toggle functionality
             $('#theme-switch').change(function() {
                 if (this.checked) {
@@ -406,7 +382,7 @@
                     localStorage.setItem('theme', 'dark');
                 }
             });
-    
+
             // Load saved theme preference
             var savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'light') {
