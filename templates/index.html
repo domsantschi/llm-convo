@@ -224,11 +224,15 @@
                     success: function(response) {
                         if (response.status === "success") {
                             $('#connect-endpoint' + endpointNum).css('background-color', 'var(--button-ready-bg-color)');
+                            $('#connect-endpoint' + endpointNum).text('Endpoint ' + endpointNum + ' Connected');
                             if (endpointNum === 1) {
                                 endpoint1Connected = true;
                             } else {
                                 endpoint2Connected = true;
                             }
+                            // Save to localStorage
+                            localStorage.setItem('endpoint' + endpointNum, endpointUrl);
+                            localStorage.setItem('systemPrompt' + endpointNum, systemPrompt);
                         } else {
                             $('#connect-endpoint' + endpointNum).css('background-color', 'var(--button-pending-bg-color)');
                             if (endpointNum === 1) {
@@ -277,88 +281,87 @@
             $('#send').prop('disabled', true).css('background-color', 'var(--button-inactive-bg-color)');
             $('#stop').prop('disabled', true).css('background-color', 'var(--button-inactive-bg-color)');
 
-         $('#send').click(function() {
-            var prompt = $('#prompt').val();
-            var numExchanges = $('#num-exchanges').val();
-            if (prompt) {
-                // Update the initial prompt content without clearing the conversation
-                $('#initial-prompt-content').text(prompt);
-                $('#prompt').val('');
+            $('#send').click(function() {
+                var prompt = $('#prompt').val();
+                var numExchanges = $('#num-exchanges').val();
+                if (prompt) {
+                    $('#initial-prompt-content').text(prompt);
+                    $('#prompt').val('');
 
-                var conversation = $('#conversation');
-                
-                currentXHR = new XMLHttpRequest();
-                currentXHR.open('POST', '/chat', true);
-                currentXHR.setRequestHeader('Content-Type', 'application/json');
-                currentXHR.send(JSON.stringify({prompt: prompt, num_exchanges: numExchanges}));
+                    var conversation = $('#conversation');
+                    
+                    currentXHR = new XMLHttpRequest();
+                    currentXHR.open('POST', '/chat', true);
+                    currentXHR.setRequestHeader('Content-Type', 'application/json');
+                    currentXHR.send(JSON.stringify({prompt: prompt, num_exchanges: numExchanges}));
 
-                // Enable Stop button and change its color to red
-                $('#stop').prop('disabled', false).css('background-color', 'var(--button-pending-bg-color)');
+                    // Enable Stop button and change its color to red
+                    $('#stop').prop('disabled', false).css('background-color', 'var(--button-pending-bg-color)');
 
-                var currentMessage = null;
-                var currentContent = '';
+                    var currentMessage = null;
+                    var currentContent = '';
 
-                currentXHR.onprogress = function() {
-                    var newData = currentXHR.response.substr(currentXHR.seenBytes || 0);
-                    currentXHR.seenBytes = currentXHR.response.length;
+                    currentXHR.onprogress = function() {
+                        var newData = currentXHR.response.substr(currentXHR.seenBytes || 0);
+                        currentXHR.seenBytes = currentXHR.response.length;
 
-                    var messages = newData.split('\n');
-                    messages.forEach(function(message) {
-                        if (message.trim() !== '') {
-                            try {
-                                var data = JSON.parse(message);
-                                if (data.error) {
-                                    alert('Error: ' + data.error);
-                                    return;
+                        var messages = newData.split('\n');
+                        messages.forEach(function(message) {
+                            if (message.trim() !== '') {
+                                try {
+                                    var data = JSON.parse(message);
+                                    if (data.error) {
+                                        alert('Error: ' + data.error);
+                                        return;
+                                    }
+                                    if (data.sender) {
+                                        if (currentMessage) {
+                                            currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
+                                        }
+                                        currentMessage = $('<div class="message">');
+                                        currentMessage.data('sender', data.sender);
+                                        currentContent = '';
+                                        var messageHtml = '<p><strong>' + data.sender + ':</strong> ';
+                                        if (data.message) {
+                                            messageHtml += data.message;
+                                        }
+                                        messageHtml += '</p>';
+                                        currentMessage.html(messageHtml);
+                                        conversation.append(currentMessage);
+                                    } else if (data.content) {
+                                        currentContent += data.content;
+                                        if (currentMessage) {
+                                            currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
+                                        }
+                                    } else if (data.end) {
+                                        if (currentMessage) {
+                                            var statsHtml = '<div class="message-info">'
+                                                + data.timestamp + ' - '
+                                                + data.model + ' - '
+                                                + data.total_tokens + ' tokens - '
+                                                + data.tps.toFixed(2) + ' tokens/sec</div>';
+                                            currentMessage.append(statsHtml);
+                                        }
+                                        currentMessage = null;
+                                        currentContent = '';
+                                    }
+                                } catch (e) {
+                                    console.error('Error parsing message:', e);
                                 }
-                                if (data.sender) {
-                                    if (currentMessage) {
-                                        currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
-                                    }
-                                    currentMessage = $('<div class="message">');
-                                    currentMessage.data('sender', data.sender);
-                                    currentContent = '';
-                                    var messageHtml = '<p><strong>' + data.sender + ':</strong> ';
-                                    if (data.message) {
-                                        messageHtml += data.message;
-                                    }
-                                    messageHtml += '</p>';
-                                    currentMessage.html(messageHtml);
-                                    conversation.append(currentMessage);
-                                } else if (data.content) {
-                                    currentContent += data.content;
-                                    if (currentMessage) {
-                                        currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
-                                    }
-                                } else if (data.end) {
-                                    if (currentMessage) {
-                                        var statsHtml = '<div class="message-info">'
-                                            + data.timestamp + ' - '
-                                            + data.model + ' - '
-                                            + data.total_tokens + ' tokens - '
-                                            + data.tps.toFixed(2) + ' tokens/sec</div>';
-                                        currentMessage.append(statsHtml);
-                                    }
-                                    currentMessage = null;
-                                    currentContent = '';
-                                }
-                            } catch (e) {
-                                console.error('Error parsing message:', e);
                             }
-                        }
-                    });
-                    conversation.scrollTop(conversation[0].scrollHeight);
-                };
+                        });
+                        conversation.scrollTop(conversation[0].scrollHeight);
+                    };
 
-                currentXHR.onload = function() {
-                    if (currentMessage) {
-                        currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
-                    }
-                    // Disable Stop button and change its color back to grey
-                    $('#stop').prop('disabled', true).css('background-color', 'var(--button-inactive-bg-color)');
-                };
-            }
-        });
+                    currentXHR.onload = function() {
+                        if (currentMessage) {
+                            currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
+                        }
+                        // Disable Stop button and change its color back to grey
+                        $('#stop').prop('disabled', true).css('background-color', 'var(--button-inactive-bg-color)');
+                    };
+                }
+            });
 
             $('#stop').click(function() {
                 if (currentXHR) {
