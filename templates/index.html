@@ -207,6 +207,7 @@
         var currentXHR = null;  // Track the active request for stopping
         var endpoint1Connected = false;
         var endpoint2Connected = false;
+        var conversationHistory = [];
 
         function connectEndpoint(endpointNum) {
             var endpointUrl = $('#endpoint' + endpointNum).val();
@@ -266,6 +267,13 @@
             }
         }
 
+        function addMessage(sender, message) {
+            var conversation = $('#conversation');
+            var messageHtml = '<div class="message"><p><strong>' + sender + ':</strong> ' + message + '</p></div>';
+            conversation.append(messageHtml);
+            conversation.scrollTop(conversation[0].scrollHeight);
+        }
+
         $(document).ready(function() {
             // Load saved values
             $('#endpoint1').val(localStorage.getItem('endpoint1') || '');
@@ -285,15 +293,26 @@
                 var prompt = $('#prompt').val();
                 var numExchanges = $('#num-exchanges').val();
                 if (prompt) {
+                    // Add current prompt to conversation history
+                    conversationHistory.push({sender: 'You', message: prompt});
+
+                    // Update initial prompt text
                     $('#initial-prompt-content').text(prompt);
                     $('#prompt').val('');
 
-                    var conversation = $('#conversation');
-                    
+                    // Send conversation history to backend
+                    var conversationData = {
+                        prompt: prompt,
+                        num_exchanges: numExchanges,
+                        conversation_history: conversationHistory,
+                        system_prompt1: localStorage.getItem('systemPrompt1') || '',
+                        system_prompt2: localStorage.getItem('systemPrompt2') || ''
+                    };
+
                     currentXHR = new XMLHttpRequest();
                     currentXHR.open('POST', '/chat', true);
                     currentXHR.setRequestHeader('Content-Type', 'application/json');
-                    currentXHR.send(JSON.stringify({prompt: prompt, num_exchanges: numExchanges}));
+                    currentXHR.send(JSON.stringify(conversationData));
 
                     // Enable Stop button and change its color to red
                     $('#stop').prop('disabled', false).css('background-color', 'var(--button-pending-bg-color)');
@@ -334,14 +353,11 @@
                                             currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
                                         }
                                     } else if (data.end) {
-                                        if (currentMessage) {
-                                            var statsHtml = '<div class="message-info">'
-                                                + data.timestamp + ' - '
-                                                + data.model + ' - '
-                                                + data.total_tokens + ' tokens - '
-                                                + data.tps.toFixed(2) + ' tokens/sec</div>';
-                                            currentMessage.append(statsHtml);
-                                        }
+                                        currentMessage.find('.message-info').append('<br>'
+                                            + data.timestamp + ' - '
+                                            + data.model + ' - '
+                                            + data.total_tokens + ' tokens - '
+                                            + data.tps.toFixed(2) + ' tokens/sec');
                                         currentMessage = null;
                                         currentContent = '';
                                     }
