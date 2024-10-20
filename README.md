@@ -31,7 +31,7 @@ You are an AI with a distinct personality. Respond naturally to the given prompt
 
 
 
-To try it out in docker:
+# Try it out in docker:
 ```
 git clone https://github.com/hugalafutro/llm-convo.git
 cd llm-convo
