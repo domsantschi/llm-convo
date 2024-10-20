@@ -59,8 +59,6 @@ llm-convo  | Press CTRL+C to quit
 - You should get an popup connection succesful and the Endpoint button will turn green.
 - Once both Endpoint buttons are green it's go time.
 - Write the Intial Prompt in the bottom text input area and click the Send button.
-- ???
-- Profit.
 
 ---
 
