@@ -55,7 +55,7 @@ llm-convo  | Press CTRL+C to quit
 - Visit `http://0.0.0.0:5234`
 - Enter the openai compatible api checkpoint address in format `http://address:port/v1` i.e. `http://192.168.1.163:5001/v1` and press Connect Endpoint button for both Endpoints.
 - You should get an popup connection succesful and the Endpoint button will turn green.
-- Once both Enndpoint buttons are green it's go time.
+- Once both Endpoint buttons are green it's go time.
 - Write the Intial Prompt in the bottom text input area and click the Send button.
 
 ---
