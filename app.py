@@ -25,17 +25,14 @@ def get_model_name(endpoint):
     except:
         return 'Unknown Model'
 
-def stream_response(endpoint, prompt, system_prompt):
+def stream_response(endpoint, prompt, conversation_history):
     headers = {
         "Content-Type": "application/json"
     }
-    messages = [{"role": "system", "content": system_prompt}] if system_prompt else []
-    messages.append({"role": "user", "content": prompt})
-
     data = {
         "model": "gpt-3.5-turbo",
-        "messages": messages,
-        "stream": True
+        "messages": conversation_history + [{"role": "user", "content": prompt}],
+        "stream": True  # We need to stream the response
     }
 
     try:
@@ -43,7 +40,7 @@ def stream_response(endpoint, prompt, system_prompt):
         response.raise_for_status()
 
         total_tokens = 0  # Track number of tokens
-        start_time = time.time()  # Start time tracking
+        start_time = time.time()  # Time tracking
 
         for line in response.iter_lines():
             if line:
@@ -56,21 +53,21 @@ def stream_response(endpoint, prompt, system_prompt):
 
                         if 'choices' in chunk:
                             # Count tokens generated in this chunk
-                            content = chunk['choices'][0].get('delta', {}).get('content', '')
-                            token_count = len(content.split())  # Token estimate by word count
+                            content = chunk['choices'][0]['delta'].get('content', '')
+                            token_count = len(content.split())  # Naive token estimation by word count
                             total_tokens += token_count
 
-                            yield chunk  # Yield valid responses
+                            yield chunk  # Yield valid responses to the frontend
                     except json.JSONDecodeError:
                         print(f"Invalid JSON: {line}")
 
-        elapsed_time = time.time() - start_time  # Time taken
-        if elapsed_time > 0:  # Prevent division by zero error
+        elapsed_time = time.time() - start_time  # Time taken to generate the tokens
+        if elapsed_time > 0:  # Avoid division by zero errors
             tokens_per_second = total_tokens / elapsed_time
         else:
             tokens_per_second = 0
         
-        # Yield the tokens per second info to the front end
+        # Yield a summary with token count and token per second rate
         yield {"total_tokens": total_tokens, "elapsed_time": elapsed_time, "tps": tokens_per_second}
     except requests.RequestException as e:
         yield json.dumps({"error": str(e)})
@@ -111,7 +108,12 @@ def chat():
     
     initial_prompt = request.json['prompt']
     num_exchanges = int(request.json['num_exchanges'])
-    
+
+    conversation_history = [
+        {"role": "system", "content": SYSTEM_PROMPT1},
+        {"role": "user", "content": initial_prompt}
+    ]
+
     def generate():
         current_prompt = initial_prompt
 
@@ -120,16 +122,15 @@ def chat():
             yield json.dumps({"sender": "Model 2", "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "model": MODEL2}) + '\n'
             full_response = ""
             tokens = 0  # Track tokens from Model 2
-            for chunk in stream_response(ENDPOINT2, current_prompt, SYSTEM_PROMPT2):
+            for chunk in stream_response(ENDPOINT2, current_prompt, conversation_history):
                 if 'choices' in chunk:
                     content = chunk['choices'][0]['delta'].get('content', '')
                     full_response += content
                     yield json.dumps({"content": content}) + '\n'
-                if 'total_tokens' in chunk:  
+                if 'total_tokens' in chunk:  # Pass token stats data
                     tokens = chunk['total_tokens']
                     tps = chunk['tps']
                     elapsed_time = chunk['elapsed_time']
-                    print(f"[DEBUG] Model 2 Stats: {tokens} tokens - {tps:.2f} tokens/sec")  # Debug log
 
             # Append model stats (timestamp, tokens, t/s)
             yield json.dumps({
@@ -141,12 +142,13 @@ def chat():
             }) + '\n'
             
             current_prompt = full_response  # Prepare next response for Model 1
+            conversation_history.append({"role": "assistant", "content": full_response})
 
             # Stream response from Model 1
             yield json.dumps({"sender": "Model 1", "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "model": MODEL1}) + '\n'
             full_response = ""
             tokens = 0  # Track tokens from Model 1
-            for chunk in stream_response(ENDPOINT1, current_prompt, SYSTEM_PROMPT1):
+            for chunk in stream_response(ENDPOINT1, current_prompt, conversation_history):
                 if 'choices' in chunk:
                     content = chunk['choices'][0]['delta'].get('content', '')
                     full_response += content
@@ -155,7 +157,6 @@ def chat():
                     tokens = chunk['total_tokens']
                     tps = chunk['tps']
                     elapsed_time = chunk['elapsed_time']
-                    print(f"[DEBUG] Model 1 Stats: {tokens} tokens - {tps:.2f} tokens/sec")
 
             # Append model stats (timestamp, tokens, t/s)
             yield json.dumps({
@@ -166,8 +167,10 @@ def chat():
                 "tps": tps
             }) + '\n'
 
+            current_prompt = full_response  # Prepare next response for Model 2
+            conversation_history.append({"role": "assistant", "content": full_response})
+
     return Response(stream_with_context(generate()), content_type='application/json')
 
 if __name__ == '__main__':
     app.run(debug=True)
-   
