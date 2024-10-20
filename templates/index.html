@@ -208,7 +208,7 @@
         var endpoint1Connected = false;
         var endpoint2Connected = false;
         var conversationHistory = [];
-
+    
         function connectEndpoint(endpointNum) {
             var endpointUrl = $('#endpoint' + endpointNum).val();
             var systemPrompt = $('#system-prompt' + endpointNum).val();
@@ -258,7 +258,7 @@
                 });
             }
         }
-
+    
         function updateSendButtonState() {
             if (endpoint1Connected && endpoint2Connected) {
                 $('#send').prop('disabled', false).css('background-color', 'var(--button-ready-bg-color)');
@@ -266,40 +266,40 @@
                 $('#send').prop('disabled', true).css('background-color', 'var(--button-inactive-bg-color)');
             }
         }
-
+    
         function addMessage(sender, message) {
             var conversation = $('#conversation');
             var messageHtml = '<div class="message"><p><strong>' + sender + ':</strong> ' + message + '</p></div>';
             conversation.append(messageHtml);
             conversation.scrollTop(conversation[0].scrollHeight);
         }
-
+    
         $(document).ready(function() {
             // Load saved values
             $('#endpoint1').val(localStorage.getItem('endpoint1') || '');
             $('#endpoint2').val(localStorage.getItem('endpoint2') || '');
             $('#system-prompt1').val(localStorage.getItem('systemPrompt1') || '');
             $('#system-prompt2').val(localStorage.getItem('systemPrompt2') || '');
-
+    
             $('#num-exchanges').on('input', function() {
                 $('#num-exchanges-value').text($(this).val());
             });
-
+    
             // Initially disable Send and Stop buttons
             $('#send').prop('disabled', true).css('background-color', 'var(--button-inactive-bg-color)');
             $('#stop').prop('disabled', true).css('background-color', 'var(--button-inactive-bg-color)');
-
+    
             $('#send').click(function() {
                 var prompt = $('#prompt').val();
                 var numExchanges = $('#num-exchanges').val();
                 if (prompt) {
                     // Add current prompt to conversation history
                     conversationHistory.push({sender: 'You', message: prompt});
-
+    
                     // Update initial prompt text
                     $('#initial-prompt-content').text(prompt);
                     $('#prompt').val('');
-
+    
                     // Send conversation history to backend
                     var conversationData = {
                         prompt: prompt,
@@ -308,22 +308,22 @@
                         system_prompt1: localStorage.getItem('systemPrompt1') || '',
                         system_prompt2: localStorage.getItem('systemPrompt2') || ''
                     };
-
+    
                     currentXHR = new XMLHttpRequest();
                     currentXHR.open('POST', '/chat', true);
                     currentXHR.setRequestHeader('Content-Type', 'application/json');
                     currentXHR.send(JSON.stringify(conversationData));
-
+    
                     // Enable Stop button and change its color to red
                     $('#stop').prop('disabled', false).css('background-color', 'var(--button-pending-bg-color)');
-
+    
                     var currentMessage = null;
                     var currentContent = '';
-
+    
                     currentXHR.onprogress = function() {
                         var newData = currentXHR.response.substr(currentXHR.seenBytes || 0);
                         currentXHR.seenBytes = currentXHR.response.length;
-
+    
                         var messages = newData.split('\n');
                         messages.forEach(function(message) {
                             if (message.trim() !== '') {
@@ -360,6 +360,7 @@
                                             + data.tps.toFixed(2) + ' tokens/sec');
                                         currentMessage = null;
                                         currentContent = '';
+                                        conversationHistory.push({sender: data.sender, message: currentContent});
                                     }
                                 } catch (e) {
                                     console.error('Error parsing message:', e);
@@ -368,7 +369,7 @@
                         });
                         conversation.scrollTop(conversation[0].scrollHeight);
                     };
-
+    
                     currentXHR.onload = function() {
                         if (currentMessage) {
                             currentMessage.find('p').html('<strong>' + currentMessage.data('sender') + ':</strong> ' + currentContent);
@@ -378,7 +379,7 @@
                     };
                 }
             });
-
+    
             $('#stop').click(function() {
                 if (currentXHR) {
                     currentXHR.abort();
@@ -387,7 +388,7 @@
                     alert('Streaming stopped.');
                 }
             });
-
+    
             // Theme toggle functionality
             $('#theme-switch').change(function() {
                 if (this.checked) {
@@ -398,7 +399,7 @@
                     localStorage.setItem('theme', 'dark');
                 }
             });
-
+    
             // Load saved theme preference
             var savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'light') {
