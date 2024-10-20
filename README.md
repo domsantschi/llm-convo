@@ -8,7 +8,7 @@ _edit: I successfully managed to implement some stuff while continuing the conve
 The *almost* whole conversation exported to pdf: [chat-LLM Convo development.pdf](https://github.com/user-attachments/files/17450061/chat-LLM.Convo.development.pdf)
 *(I had to remove posts with pictures as I was running out of quota and later using model which could not ingest images. So if there is a jarring disconnect or a missing reply it was a reply with picture.)*
 
-# TESTED with [koboldcpp](https://github.com/LostRuins/koboldcpp), [LM Studio](https://github.com/lmstudio-ai) openai compatible endpoints
+# TESTED with [koboldcpp](https://github.com/LostRuins/koboldcpp), [LM Studio](https://github.com/lmstudio-ai)
 
 - Dark/Light theme
 - Number of Exchanges between 3 and 30
