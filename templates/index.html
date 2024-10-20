@@ -269,6 +269,10 @@
     
         function addMessage(sender, message) {
             var conversation = $('#conversation');
+            if (conversation.length === 0) {
+                console.error('Conversation element not found!');
+                return;
+            }
             var messageHtml = '<div class="message"><p><strong>' + sender + ':</strong> ' + message + '</p></div>';
             conversation.append(messageHtml);
             conversation.scrollTop(conversation[0].scrollHeight);
@@ -367,7 +371,10 @@
                                 }
                             }
                         });
-                        conversation.scrollTop(conversation[0].scrollHeight);
+                        var conversation = $('#conversation');
+                        if (conversation.length > 0) {
+                            conversation.scrollTop(conversation[0].scrollHeight);
+                        }
                     };
     
                     currentXHR.onload = function() {
