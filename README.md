@@ -73,7 +73,7 @@ By using this application, you acknowledge and agree to the following:
 It is the sole responsibility of the user to monitor and control the conversations between the LLMs. You understand that LLMs generate text based on patterns learned from vast amounts of data, and their outputs may occasionally contain inappropriate, offensive, or inaccurate information.
 
 ## Content Disclaimer
-The developer does not endorse, promote, or condone any specific viewpoints, opinions, or statements made by the LLMs. Any depraved, illegal, or harmful content generated during the interactions is not reflective of the developer's beliefs or intentions.
+The developer does not endorse, promote, or condone any specific viewpoints, opinions, or statements made by the LLMs. Any illegal, or harmful content generated during the interactions is not reflective of the developer's beliefs or intentions.
 
 ## Screenshot and Sharing
 If you choose to screenshot or share any generated content, you do so at your own risk. The developer is not liable for any consequences arising from the distribution or interpretation of such content. It is your responsibility to ensure that the content shared complies with relevant laws and ethical standards.
