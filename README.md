@@ -3,7 +3,7 @@
 
 I used 2 (later 3) LLMs (Claude Sonnet 3.5 and chatgpt-4o-latest (later locally running Qwen2.5-Coder-7B-Instruct)) to write an app that would let 2 AI LLMs with openai compatible api endpoints talk to each other. I have zero experience with python. After running out of daily allowance on both Anthropic and OpenAI I got what's in this repo more or less. Was more of an experiment if I can make an app without any experience more than anything else. I used [open-webui](https://github.com/open-webui/open-webui) as frontend to "develop" this.
 
-I successfully managed to implement some stuff while continuing the conversation in [open-webui](https://github.com/open-webui/open-webui) with locally running [Qwen2.5-Coder-7B-Instruct-Q8_0.gguf](https://huggingface.co/bartowski/Qwen2.5-Coder-7B-Instruct-GGUF) in [koboldcpp](https://github.com/LostRuins/koboldcpp)_
+I successfully managed to implement some stuff while continuing the conversation in [open-webui](https://github.com/open-webui/open-webui) with locally running [Qwen2.5-Coder-7B-Instruct-Q8_0.gguf](https://huggingface.co/bartowski/Qwen2.5-Coder-7B-Instruct-GGUF) in [koboldcpp](https://github.com/LostRuins/koboldcpp)
 
 The *almost* whole conversation exported to pdf: [chat-LLM Convo development.pdf](https://github.com/user-attachments/files/17450061/chat-LLM.Convo.development.pdf)
 *(I had to remove posts with pictures as I was running out of quota and later using model which could not ingest images. So if there is a jarring disconnect or a missing reply it was a reply with picture.)*
