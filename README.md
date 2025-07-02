@@ -1,14 +1,9 @@
 # LLM Convo
 ***`I have no idea what I'm doing it was the LLMs I swear`***
 
-I used 2 (later 3) LLMs (Claude Sonnet 3.5 and chatgpt-4o-latest (later locally running Qwen2.5-Coder-7B-Instruct)) to write an app that would let 2 AI LLMs with openai compatible api endpoints talk to each other. I have zero experience with python. After running out of daily allowance on both Anthropic and OpenAI I got what's in this repo more or less. Was more of an experiment if I can make an app without any experience more than anything else. I used [open-webui](https://github.com/open-webui/open-webui) as frontend to "develop" this.
+Forked from [hugalafutro/llm-convo](https://github.com/hugalafutro/llm-convo) 
 
-I successfully managed to implement some stuff while continuing the conversation in [open-webui](https://github.com/open-webui/open-webui) with locally running [Qwen2.5-Coder-7B-Instruct-Q8_0.gguf](https://huggingface.co/bartowski/Qwen2.5-Coder-7B-Instruct-GGUF) in [koboldcpp](https://github.com/LostRuins/koboldcpp)
-
-The *almost* whole conversation exported to pdf: [chat-LLM Convo development.pdf](https://github.com/user-attachments/files/17450061/chat-LLM.Convo.development.pdf)
-*(I had to remove posts with pictures as I was running out of quota and later using model which could not ingest images. So if there is a jarring disconnect or a missing reply it was a reply with picture.)*
-
-# TESTED with [koboldcpp](https://github.com/LostRuins/koboldcpp), [LM Studio](https://github.com/lmstudio-ai), [Ollama](https://github.com/ollama/ollama)
+## TESTED with [Ollama](https://github.com/ollama/ollama)
 
 - Dark/Light theme
 - Number of Exchanges between 3 and 30
@@ -33,7 +28,6 @@ You are an AI with a distinct personality. Respond naturally to the given prompt
 
 # Try it out in docker:
 ```
-git clone https://github.com/hugalafutro/llm-convo.git
 cd llm-convo
 docker compose build
 docker compose up -d
@@ -59,8 +53,8 @@ chmod +x setup-ollama.sh
 # Pull Llama 3.2 3B to first instance
 docker exec ollama1 ollama pull llama3.2:3b
 
-# Pull Phi-3 Mini to second instance  
-docker exec ollama2 ollama pull phi3:mini
+# Pull tinyllama to second instance  
+docker exec ollama2 ollama pull tinyllama
 
 # List available models
 docker exec ollama1 ollama list
@@ -68,8 +62,8 @@ docker exec ollama2 ollama list
 ```
 
 Your Ollama endpoints will be available at:
-- **Endpoint 1 (Llama 3.2 3B)**: `http://localhost:11434/v1`
-- **Endpoint 2 (Phi-3 Mini)**: `http://localhost:11435/v1`
+- **Endpoint 1 (Llama 3.2 3B)**: `http://172.20.0.1:11434`
+- **Endpoint 2 (tinyllama)**: `http://172.20.0.1:11435`
 
 
 Check docker logs `docker compose logs -f`:
@@ -83,13 +77,9 @@ llm-convo  |  * Running on http://172.26.0.2:5000
 llm-convo  | Press CTRL+C to quit
 ```
 
-
-- Visit `http://0.0.0.0:5234`
-- For [koboldcpp](https://github.com/LostRuins/koboldcpp) enter the Endpoint address in format `http://address:port/v1` i.e. `http://192.168.1.163:5001/v1`
-- For [LM Studio](https://github.com/lmstudio-ai) enter the Endpoint address in format `http://address:port` i.e. `http://192.168.1.163:5001`
 - For [Ollama](https://github.com/ollama/ollama) use the two separate instances:
-  - **Endpoint 1**: `http://localhost:11434/v1` (Llama 3.2 3B)
-  - **Endpoint 2**: `http://localhost:11435/v1` (Phi-3 Mini)
+    - **Endpoint 1 (Llama 3.2 3B)**: `http://172.20.0.1:11434`
+    - **Endpoint 2 (tinyllama)**: `http://172.20.0.1:11435`
 - press Connect Endpoint button.
 - You should get an popup connection succesful and the Endpoint button will turn green.
 - Once both Endpoint buttons are green it's go time.
