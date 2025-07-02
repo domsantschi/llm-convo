@@ -26,17 +26,24 @@ def get_model_name(endpoint):
         return 'Unknown Model'
 
 def stream_response(endpoint, prompt, conversation_history):
+    # Get the actual model name from the endpoint
+    model_name = get_model_name(endpoint)
+    print(f"Using model: {model_name} for endpoint: {endpoint}")  # Debug log
+    
     headers = {
         "Content-Type": "application/json"
     }
     data = {
-        "model": "gpt-3.5-turbo",
+        "model": model_name,  # Use the actual model name instead of hardcoded gpt-3.5-turbo
         "messages": conversation_history + [{"role": "user", "content": prompt}],
         "stream": True  # We need to stream the response
     }
 
     try:
+        print(f"Sending request to: {endpoint}/v1/chat/completions")  # Debug log
+        print(f"Request data: {data}")  # Debug log
         response = requests.post(f"{endpoint}/v1/chat/completions", headers=headers, json=data, stream=True)
+        print(f"Response status: {response.status_code}")  # Debug log
         response.raise_for_status()
 
         total_tokens = 0  # Track number of tokens
@@ -70,7 +77,8 @@ def stream_response(endpoint, prompt, conversation_history):
         # Yield a summary with token count and token per second rate
         yield {"total_tokens": total_tokens, "elapsed_time": elapsed_time, "tps": tokens_per_second}
     except requests.RequestException as e:
-        yield json.dumps({"error": str(e)})
+        print(f"Request error: {str(e)}")  # Debug log
+        yield {"error": str(e)}
 
 @app.route('/')
 def index():

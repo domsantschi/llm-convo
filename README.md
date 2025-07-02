@@ -8,7 +8,7 @@ I successfully managed to implement some stuff while continuing the conversation
 The *almost* whole conversation exported to pdf: [chat-LLM Convo development.pdf](https://github.com/user-attachments/files/17450061/chat-LLM.Convo.development.pdf)
 *(I had to remove posts with pictures as I was running out of quota and later using model which could not ingest images. So if there is a jarring disconnect or a missing reply it was a reply with picture.)*
 
-# TESTED with [koboldcpp](https://github.com/LostRuins/koboldcpp), [LM Studio](https://github.com/lmstudio-ai)
+# TESTED with [koboldcpp](https://github.com/LostRuins/koboldcpp), [LM Studio](https://github.com/lmstudio-ai), [Ollama](https://github.com/ollama/ollama)
 
 - Dark/Light theme
 - Number of Exchanges between 3 and 30
@@ -39,6 +39,38 @@ docker compose build
 docker compose up -d
 ```
 
+## Setting up Ollama models:
+
+After starting the containers, you need to pull some models for Ollama:
+
+**Option 1: Use the setup script (Windows PowerShell):**
+```powershell
+.\setup-ollama.ps1
+```
+
+**Option 2: Use the setup script (Linux/Mac):**
+```bash
+chmod +x setup-ollama.sh
+./setup-ollama.sh
+```
+
+**Option 3: Manual setup:**
+```bash
+# Pull Llama 3.2 3B to first instance
+docker exec ollama1 ollama pull llama3.2:3b
+
+# Pull Phi-3 Mini to second instance  
+docker exec ollama2 ollama pull phi3:mini
+
+# List available models
+docker exec ollama1 ollama list
+docker exec ollama2 ollama list
+```
+
+Your Ollama endpoints will be available at:
+- **Endpoint 1 (Llama 3.2 3B)**: `http://localhost:11434/v1`
+- **Endpoint 2 (Phi-3 Mini)**: `http://localhost:11435/v1`
+
 
 Check docker logs `docker compose logs -f`:
 ```
@@ -55,6 +87,9 @@ llm-convo  | Press CTRL+C to quit
 - Visit `http://0.0.0.0:5234`
 - For [koboldcpp](https://github.com/LostRuins/koboldcpp) enter the Endpoint address in format `http://address:port/v1` i.e. `http://192.168.1.163:5001/v1`
 - For [LM Studio](https://github.com/lmstudio-ai) enter the Endpoint address in format `http://address:port` i.e. `http://192.168.1.163:5001`
+- For [Ollama](https://github.com/ollama/ollama) use the two separate instances:
+  - **Endpoint 1**: `http://localhost:11434/v1` (Llama 3.2 3B)
+  - **Endpoint 2**: `http://localhost:11435/v1` (Phi-3 Mini)
 - press Connect Endpoint button.
 - You should get an popup connection succesful and the Endpoint button will turn green.
 - Once both Endpoint buttons are green it's go time.

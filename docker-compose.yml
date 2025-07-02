@@ -14,3 +14,44 @@ services:
       - FLASK_ENV=development
       - FLASK_RUN_HOST=0.0.0.0
     restart: unless-stopped
+    depends_on:
+      - ollama1
+      - ollama2
+
+  ollama1:
+    container_name: ollama1
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama1_data:/root/.ollama
+    restart: unless-stopped
+    # Uncomment the following lines if you have an NVIDIA GPU
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  ollama2:
+    container_name: ollama2
+    image: ollama/ollama:latest
+    ports:
+      - "11435:11434"
+    volumes:
+      - ollama2_data:/root/.ollama
+    restart: unless-stopped
+    # Uncomment the following lines if you have an NVIDIA GPU
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+volumes:
+  ollama1_data:
+  ollama2_data:
